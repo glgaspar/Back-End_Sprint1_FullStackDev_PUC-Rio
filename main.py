@@ -130,6 +130,35 @@ def products():
 
     return {"product":product_list}
 
+@app.get("/productDetail", tags=['product'], responses={200: {"model": Itens}})
+def products(productId:int):
+    """
+    Fetches all data about a product from db
+    
+    Returns object with all data about requested product.
+    """
+    db = sqlite3.connect('db.db')
+    cursor = db.cursor()
+    product =  cursor.execute(f"""
+        SELECT 
+            P.ID, P.NAME, P.DESCRIPTION, P.PRICE, P.CATEGORY, P.LINK AS IMG
+            , B.NAME AS BRAND
+        FROM PRODUCTS P
+        JOIN BRANDS B
+            ON B.ID = P.BRAND_ID
+        WHERE P.ID = {productId}
+        """).fetchone()
+
+    return {
+            'id':product[0]
+            ,'name':product[1]
+            ,'description':[i for i in product[2].split(' | ')]
+            ,'unitPrice':product[3]
+            ,'category':product[4]
+            ,'img':product[5]
+            ,'brand':product[6]
+            }
+
 
 
 hostname=socket.gethostname()   
