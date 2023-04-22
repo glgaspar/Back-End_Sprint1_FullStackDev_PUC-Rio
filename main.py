@@ -178,6 +178,45 @@ def new_purchase(NewPurchase:NewPurchase):
     db.commit()
     return {'message':'Purchase successful'}
 
+@app.get("/purchases", tags=['purchase'], responses={200: {"model": UserPurchases}})
+def purchases(userEmail:str):
+    """
+    Fetches all data about user purchases
+    
+    Returns array of purchases with neste array of itens related to the purchase.
+    """
+    db = sqlite3.connect('db.db')
+    cursor = db.cursor()
+    orders =  cursor.execute(f"""
+        SELECT O.ID,  O.DATE, O.CANCEL
+        FROM ORDERS O
+        JOIN USERS U
+            ON U.EMAIL = O.USER_ID
+        WHERE O.USER_ID = '{userEmail}'
+        """).fetchall()
+
+    itens =  cursor.execute(f"""
+    SELECT 
+        I.ORDER_ID, P.NAME AS PRODUCT, B.NAME AS BRAND, I.AMOUNT, I.UNIT_PRICE
+        , P.LINK AS IMG
+    FROM ORDER_ITENS I
+    JOIN PRODUCTS P ON P.ID = I.PRODUCT_ID
+    JOIN BRANDS B ON B.ID = P.BRAND_ID
+    JOIN ORDERS O ON O.ID = I.ORDER_ID
+    WHERE O.USER_ID = '{userEmail}'""").fetchall()
+
+    order_list = []
+    for order in orders:
+        order_list.append(
+            {'id':order[0],
+            'date':order[1],
+            'cancel':order[2],
+            'itens':[{'product':item[1],'brand':item[2],'amount':item[3],'unitPrice':item[4], 'img':item[5]} for item in itens if item[0]==order[0]]
+            }
+        )
+    return {"orders":order_list}
+
+
 
 hostname=socket.gethostname()   
 IPAddr=socket.gethostbyname(hostname)
