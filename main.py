@@ -55,6 +55,38 @@ def register(register:Register, response:Response):
     
     return {"message":'register successful'}
 
+@app.post("/login", tags=['user'], responses={400: {"model": LoginError}, 200: {"model":LoginSuccess}})
+def login(Login:Login, response:Response):
+    """
+    Logs in user
+
+    Returns message with login confirmation or rejection and user data
+    """
+
+    db = sqlite3.connect('db.db')
+    cursor = db.cursor()
+    validation = cursor.execute(f"SELECT EMAIL, PASSWORD  FROM  LOGIN WHERE  EMAIL='{Login.email}'")
+    validation_pass = validation.fetchone()
+    
+    if validation_pass and validation_pass[1] == Login.pssw:
+        user_info = cursor.execute(f"SELECT  NAME, EMAIL, TEL, ADDRESS FROM USERS WHERE EMAIL = '{Login.email}'").fetchone()
+        message = {
+            "message":"Login successful"
+        }
+        data = {
+            "user":user_info[0],
+            "email":user_info[1],
+            "tel":user_info[2],
+            "address":user_info[3],
+        }
+    else:
+        response.status_code=status.HTTP_400_BAD_REQUEST
+        message = {
+            "message":"Password no match"
+        }
+        data = {}
+    return {'message':message,'user':data}
+
 
 
 hostname=socket.gethostname()   
