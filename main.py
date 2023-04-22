@@ -230,6 +230,20 @@ def cancel_purchase(orderId:int):
     db.commit()
     return {'message':'Order canceled'}
 
+@app.post('/contact', tags=['contact'], responses={200: {"model": ContactSuccess}})
+def contact(Contact:Contact):
+    """
+    Registers a message sent by an user to the db
+    
+    Returns a message confirming the operation.
+    """
+    db = sqlite3.connect('db.db')
+    cursor = db.cursor()
+    cursor.execute(f"""INSERT INTO CONTACT (NAME, EMAIL, TEL, MESSAGE)
+                    VALUES('{Contact.name}','{Contact.email}','{Contact.tel}','{Contact.message}')""")
+    db.commit()
+    return {'message':'Contact registered'}
+
 
 hostname=socket.gethostname()   
 IPAddr=socket.gethostbyname(hostname)
