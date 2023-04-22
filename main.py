@@ -159,6 +159,24 @@ def products(productId:int):
             ,'brand':product[6]
             }
 
+@app.post("/newPurchase", tags=['purchase'], responses={200: {"model": PurchaseSuccess}})
+def new_purchase(NewPurchase:NewPurchase):
+    """
+    Registers new purchase in db
+    
+    Returns a message confirming success or not.
+    """
+    db = sqlite3.connect('db.db')
+    cursor = db.cursor()
+    newOrderId = cursor.execute(f"SELECT MAX(ID)+1 as id FROM ORDERS").fetchone()
+    cursor.execute(f"""INSERT INTO ORDERS (USER_ID, DATE, CANCEL)
+                    VALUES('{NewPurchase.email}', DATETIME('now'), 0)""")
+                    
+    cursor.execute(f"""INSERT INTO ORDER_ITENS (ORDER_ID, PRODUCT_ID, AMOUNT, UNIT_PRICE)
+                    VALUES('{newOrderId[0]}', {NewPurchase.productId}, {NewPurchase.amount}, {NewPurchase.unitPrice} )
+                    """)
+    db.commit()
+    return {'message':'Purchase successful'}
 
 
 hostname=socket.gethostname()   
