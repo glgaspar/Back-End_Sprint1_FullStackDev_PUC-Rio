@@ -87,6 +87,49 @@ def login(Login:Login, response:Response):
         data = {}
     return {'message':message,'user':data}
 
+@app.get("/products", tags=['product'], responses={200: {"model":list[ProductList] }})
+def products():
+    """
+    Fetches all data about the products from db
+    
+    Returns item details grpuped by category.
+    """
+    db = sqlite3.connect('db.db')
+    cursor = db.cursor()
+    products =  cursor.execute(f"""
+        SELECT P.ID, P.NAME, P.DESCRIPTION, P.PRICE, P.CATEGORY, P.LINK AS IMG
+        , B.NAME AS BRAND
+        FROM PRODUCTS P
+        JOIN BRANDS B
+            ON B.ID = P.BRAND_ID
+        """).fetchall()
+
+    categories = cursor.execute(f"""
+        SELECT DISTINCT CATEGORY 
+        FROM PRODUCTS
+        """).fetchall()    
+    
+    product_list = []
+    for category in categories:
+        product_list.append(
+            {'categories':category[0],
+            'itens': [
+                        {
+                            'id':product[0]
+                            ,'name':product[1]
+                            ,'description':product[2]
+                            ,'price':product[3]
+                            ,'category':product[4]
+                            ,'img':product[5]
+                            ,'brand':product[6]
+                        }
+                        for product in products if product[4]==category[0]
+                    ]
+            }
+        )
+
+    return {"product":product_list}
+
 
 
 hostname=socket.gethostname()   
