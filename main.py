@@ -216,6 +216,19 @@ def purchases(userEmail:str):
         )
     return {"orders":order_list}
 
+@app.put('/cancelOrder', tags=['purchase'], responses={200: {"model": PurchaseCancelSuccess}})
+def cancel_purchase(orderId:int):
+    """
+    Changes the cancel status of an order from 0 to 1
+    
+    Returns a message confirming the operation.
+    """
+    db = sqlite3.connect('db.db')
+    cursor = db.cursor()
+    cursor.execute(f"""UPDATE ORDERS
+                    SET CANCEL = 1 WHERE ID = {orderId}""")
+    db.commit()
+    return {'message':'Order canceled'}
 
 
 hostname=socket.gethostname()   
