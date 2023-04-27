@@ -29,6 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.post("/newUser", tags=['user'], responses={400: {"model": RegisterError}, 200: {"model":RegisterSuccess}})
 def register(register:Register, response:Response):
     """
@@ -54,6 +55,7 @@ def register(register:Register, response:Response):
     
     
     return {"message":'register successful'}
+
 
 @app.post("/login", tags=['user'], responses={400: {"model": LoginError}, 200: {"model":LoginSuccess}})
 def login(Login:Login, response:Response):
@@ -87,6 +89,7 @@ def login(Login:Login, response:Response):
         data = {}
     return {'message':message,'user':data}
 
+
 @app.get("/products", tags=['product'], responses={200: {"model":list[ProductList] }})
 def products():
     """
@@ -94,6 +97,7 @@ def products():
     
     Returns item details grpuped by category.
     """
+    
     db = sqlite3.connect('db.db')
     cursor = db.cursor()
     products =  cursor.execute(f"""
@@ -127,8 +131,8 @@ def products():
                     ]
             }
         )
-
     return {"product":product_list}
+
 
 @app.get("/productDetail", tags=['product'], responses={200: {"model": Itens}})
 def products(productId:int):
@@ -137,6 +141,7 @@ def products(productId:int):
     
     Returns object with all data about requested product.
     """
+    
     db = sqlite3.connect('db.db')
     cursor = db.cursor()
     product =  cursor.execute(f"""
@@ -159,6 +164,7 @@ def products(productId:int):
             ,'brand':product[6]
             }
 
+
 @app.post("/newPurchase", tags=['purchase'], responses={200: {"model": PurchaseSuccess}})
 def new_purchase(NewPurchase:NewPurchase):
     """
@@ -166,6 +172,7 @@ def new_purchase(NewPurchase:NewPurchase):
     
     Returns a message confirming success or not.
     """
+    
     db = sqlite3.connect('db.db')
     cursor = db.cursor()
     newOrderId = cursor.execute(f"SELECT MAX(ID)+1 as id FROM ORDERS").fetchone()
@@ -178,6 +185,7 @@ def new_purchase(NewPurchase:NewPurchase):
     db.commit()
     return {'message':'Purchase successful'}
 
+
 @app.get("/purchases", tags=['purchase'], responses={200: {"model": UserPurchases}})
 def purchases(userEmail:str):
     """
@@ -185,6 +193,7 @@ def purchases(userEmail:str):
     
     Returns array of purchases with neste array of itens related to the purchase.
     """
+    
     db = sqlite3.connect('db.db')
     cursor = db.cursor()
     orders =  cursor.execute(f"""
@@ -216,6 +225,7 @@ def purchases(userEmail:str):
         )
     return {"orders":order_list}
 
+
 @app.put('/cancelOrder', tags=['purchase'], responses={200: {"model": PurchaseCancelSuccess}})
 def cancel_purchase(orderId:int):
     """
@@ -223,12 +233,14 @@ def cancel_purchase(orderId:int):
     
     Returns a message confirming the operation.
     """
+    
     db = sqlite3.connect('db.db')
     cursor = db.cursor()
     cursor.execute(f"""UPDATE ORDERS
                     SET CANCEL = 1 WHERE ID = {orderId}""")
     db.commit()
     return {'message':'Order canceled'}
+
 
 @app.post('/contact', tags=['contact'], responses={200: {"model": ContactSuccess}})
 def contact(Contact:Contact):
@@ -237,6 +249,7 @@ def contact(Contact:Contact):
     
     Returns a message confirming the operation.
     """
+    
     db = sqlite3.connect('db.db')
     cursor = db.cursor()
     cursor.execute(f"""INSERT INTO CONTACT (NAME, EMAIL, TEL, MESSAGE)
