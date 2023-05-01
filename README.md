@@ -6,7 +6,7 @@ Essa API controla todas as ações relacionadas a busca e envio de dados necess�
 
 ## Dependências
 
-As dependências do programa estão contidas no arquivo requirements.txt e pode ser instaladas com o comando 
+As dependências do programa estão contidas no arquivo requirements.txt e podem ser instaladas com o comando 
 
     pip install -r requirements.txt 
 
@@ -16,6 +16,6 @@ Basta executar o arquivo main.py para o serviço ser aberto em http://localhost:
 
 ## Documentação
 
-A documentação da API em swagger é disponibilizada no memento da sua execução no endpoint /docs.
+A documentação da API em swagger é disponibilizada no momento da sua execução no endpoint /docs.
 
-A mesma, no formato Redoc está disponível no arquivo docs.html e pode ser lido diretamente pelo navegador.
+A mesma, no formato Redoc, está disponível no arquivo docs.html e pode ser lido diretamente pelo navegador sem a necessidade de executar o programa.
